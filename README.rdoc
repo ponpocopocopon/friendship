@@ -1,0 +1,50 @@
+# Friendship
+
+Friend relations are given to a user table. 
+some methods are added to a user model. 
+
+```ruby
+  my.friends          # my friend user list
+  my.friend!(you)     # add friend(or friend request)
+  my.unfriend!(you)   # remove friend
+  my.friend?(you)     # you are my friend?
+  my.friend_by?(you)  # you are unrequited friend to me?
+```
+
+```ruby
+  my.send_pending_friends 
+  my.receive_pending_friends 
+  my.allow_friend!(you)
+  my.deny_friend!(you)
+```
+
+## Install
+### migrate
+  ```
+    rake friendship:install:migrations
+    rake db:migrate
+  ```
+
+### include the model module
+  ```ruby
+    class User < ActiveRecord::Base
+      include Friendship::Model
+  ```
+  
+### option methods.
+  
+
+  Permission is needed for a friend application. 
+  ```ruby
+    class User < ActiveRecord::Base
+      include Friendship::Model
+      set_require_friend_recognition
+  ``` 
+
+  The friendship of the single direction is permitted. 
+
+  ```ruby
+    class User < ActiveRecord::Base
+      include Friendship::Model
+      set_possible_unrequited_friend
+  ``` 
