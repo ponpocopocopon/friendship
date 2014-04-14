@@ -41,9 +41,9 @@ module Friendship
 
   module Model
     def self.included(base)
-      base.has_many :friendships, foreign_key: :self_id, class_name: "Friendship::Relation"
       base.class_variable_set(:@@require_friend_recognition, false) # フレンド登録に認証が必要か？
       base.class_variable_set(:@@possible_unrequited_friend, false) # 一方的なフレンドが可能か？
+      base.has_many :friendships, -> { where(klass: base) }, foreign_key: :self_id, class_name: "Friendship::Relation"
       base.extend(ClassMethods)
     end 
 
@@ -78,7 +78,7 @@ module Friendship
       if pending_friendship
         pending_friendship.allow!
         unless self.class.possible_unrequited_friend?
-          self.friendships.create(friend_id: user.id, level: Relation::Levels::NORMAL)
+          self.friendships.create(klass: self.class, friend_id: user.id, level: Relation::Levels::NORMAL)
         end
       end
     end
@@ -99,7 +99,7 @@ module Friendship
     end
 
     def friend!(user)
-      friend_ship = self.friendships.create(friend_id: user.id)
+      friend_ship = self.friendships.create(klass: self.class, friend_id: user.id)
       # 認証が不要なら直後に許可する
       user.allow_friend!(self) unless self.class.require_friend_recognition?
     end
