@@ -10,6 +10,7 @@ module Friendship
 
     scope :by_friend, -> {where("level >= ?", Levels::NORMAL)}
   
+    # create friendship-level instances
     Levels.constants.each do |level_sym|
       class_eval <<-EOS
         def #{level_sym.to_s.downcase}?
@@ -42,7 +43,7 @@ module Friendship
   module Model
     def self.included(base)
       base.class_variable_set(:@@require_friend_recognition, false) # フレンド登録に認証が必要か？
-      base.class_variable_set(:@@possible_unrequited_friend, false) # 一方的なフレンドが可能か？
+      base.class_variable_set(:@@possible_simplex_friend, false) # 一方的なフレンドが可能か？
       base.has_many :friendships, -> { where(klass: base) }, foreign_key: :self_id, class_name: "Friendship::Relation"
       base.extend(ClassMethods)
     end 
@@ -55,11 +56,11 @@ module Friendship
       def require_friend_recognition?
         self.class_variable_get(:@@require_friend_recognition)
       end
-      def set_possible_unrequited_friend
-        self.class_variable_set(:@@possible_unrequited_friend, true)
+      def set_possible_simplex_friend
+        self.class_variable_set(:@@possible_simplex_friend, true)
       end
-      def possible_unrequited_friend?
-        self.class_variable_get(:@@possible_unrequited_friend)
+      def possible_simplex_friend?
+        self.class_variable_get(:@@possible_simplex_friend)
       end
     end
 
@@ -77,7 +78,7 @@ module Friendship
       pending_friendship = user.friendships.where(friend_id: self.id).first
       if pending_friendship
         pending_friendship.allow!
-        unless self.class.possible_unrequited_friend?
+        unless self.class.possible_simplex_friend?
           self.friendships.create(klass: self.class, friend_id: user.id, level: Relation::Levels::NORMAL)
         end
       end
@@ -106,7 +107,7 @@ module Friendship
 
     def unfriend!(user)
       self.friendships.where(friend_id: user.id).delete_all
-      user.friendships.where(friend_id: self.id).delete_all unless self.class.possible_unrequited_friend?
+      user.friendships.where(friend_id: self.id).delete_all unless self.class.possible_simplex_friend?
     end
 
     def friend?(user)

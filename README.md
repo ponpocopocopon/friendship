@@ -25,7 +25,7 @@ include Friendship::Model
 # The introduction of the approval system
 set_require_friend_recognition
 # Allow one-sided relationship
-set_possible_unrequited_friend
+set_possible_simplex_friend
 ```
 
 ## use
@@ -36,8 +36,8 @@ Class Methods
 ```ruby
 User.set_require_friend_recognition
 User.require_friend_recognition?
-User.set_possible_unrequited_friend
-User.possible_unrequited_friend?
+User.set_possible_simplex_friend
+User.possible_simplex_friend?
 ```
 
 Instance Methods

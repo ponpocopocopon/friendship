@@ -8,7 +8,7 @@ some methods are added to a user model.
   my.friend!(you)     # add friend(or friend request)
   my.unfriend!(you)   # remove friend
   my.friend?(you)     # you are my friend?
-  my.friend_by?(you)  # you are unrequited friend to me?
+  my.friend_by?(you)  # you are simplex friend to me?
 ```
 
 ```ruby
@@ -46,5 +46,5 @@ some methods are added to a user model.
   ```ruby
     class User < ActiveRecord::Base
       include Friendship::Model
-      set_possible_unrequited_friend
+      set_possible_simplex_friend
   ``` 
