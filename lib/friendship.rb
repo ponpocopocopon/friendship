@@ -2,7 +2,6 @@ require "friendship/engine"
 module Friendship
   class Relation < ActiveRecord::Base
     module Levels
-      #BLOCK     = -2
       CANCEL    = -1 
       PENDING   = 0
       NORMAL    = 1
@@ -34,10 +33,6 @@ module Friendship
       end
     end
   
-    #def block!
-    #  self.level = Levels::BLOCK
-    #  self.save!
-    #end
   end
 
   module Model
@@ -89,10 +84,6 @@ module Friendship
       pending_friendship.deny! if pending_friendship
     end
 
-    #def block_users 
-    #  self.friendships.by_block.pluck(:friend_id)
-    #  self.class.where(id: ids)
-    #end
 
     def friends
       ids = self.friendships.by_friend.pluck(:friend_id)
@@ -103,6 +94,7 @@ module Friendship
       friend_ship = self.friendships.create(klass: self.class, friend_id: user.id)
       # 認証が不要なら直後に許可する
       user.allow_friend!(self) unless self.class.require_friend_recognition?
+      friend_ship
     end
 
     def unfriend!(user)
@@ -117,14 +109,6 @@ module Friendship
     def friend_by?(user)
       user.friend?(self)
     end
-
-    #def block?(user)
-    #  self.friendships.where(friend_id: user.id).by_pending.exists?
-    #end
-
-    #def block_by?(user)
-    #  user.block?(self)
-    #end
 
   end
 end
